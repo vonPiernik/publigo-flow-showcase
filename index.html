@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Publigo Flow — układaj przepływy jak klocki</title>
-<meta name="description" content="Interaktywny showcase Publigo Flow: przestawiaj kroki przepływu i zobacz, jakie JSON-owe zwrotki zwracają agenty między krokami.">
+<title>Publigo Flow — buduj przepływy z klocków</title>
+<meta name="description" content="Układacz przepływów Publigo Flow: wybieraj klocki (Jira, Bitbucket, Discord, Dev Trywpi, Aibrake, Helpwise, bramka, agent) i ustawiaj kroki jeden pod drugim.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%A1%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -12,58 +12,97 @@
 
 <header class="hero">
   <div class="hero-inner">
-    <span class="hero-badge">Publigo Flow · showcase</span>
-    <h1>Układaj przepływy <span class="grad">jak klocki</span></h1>
+    <span class="hero-badge">Publigo Flow · builder</span>
+    <h1>Buduj przepływy <span class="grad">z klocków</span></h1>
     <p class="hero-sub">
-      Przeciągnij kroki w inne miejsce, żeby zobaczyć, jak można poukładać flow —
-      od pomysłu do zamknięcia taska w Jirze. Między krokami znajdziesz zwrotki
-      w formacie JSON: to, co faktycznie zwraca agent (werdykt, ustalenia, <em>confidence</em>).
+      Po lewej wybierz klocek — akcję (Jira, Bitbucket, Discord, Dev Trywpi, Aibrake, Helpwise),
+      bramkę użytkownika albo agenta. Po prawej ułóż kroki jeden pod drugim i opisz każdy
+      w jednym zdaniu. Przeciągaj kafelki, żeby zmienić kolejność.
     </p>
     <div class="hero-actions">
-      <button id="btn-simulate" class="btn btn-primary" type="button">▶ Symuluj przebieg</button>
-      <button id="btn-reset" class="btn btn-ghost" type="button">⟲ Przywróć kolejność</button>
-      <a class="btn btn-ghost" href="#flow">Zobacz kroki ↓</a>
+      <a class="btn btn-primary" href="#builder">Otwórz układacz ↓</a>
+      <a class="btn btn-ghost" href="#json">Jak działają zwrotki JSON?</a>
+      <a class="btn btn-ghost" href="#ideas">12 inspiracji przepływów</a>
     </div>
   </div>
 </header>
 
 <main class="wrap">
-  <section class="toolbar" aria-label="Narzędzia">
-    <div class="legend" id="legend"></div>
-    <div class="toolbar-right">
-      <span class="stats" id="stats"></span>
-      <button id="btn-simulate-2" class="btn btn-primary btn-sm" type="button">▶ Symuluj</button>
-      <button id="btn-reset-2" class="btn btn-ghost btn-sm" type="button">⟲ Reset</button>
+
+  <section id="builder" class="builder" aria-label="Układacz przepływu">
+    <aside class="palette">
+      <h2>Klocki</h2>
+      <p class="palette-hint">Kliknij klocek, żeby dodać krok do flow.</p>
+      <div id="palette-list" class="palette-list"></div>
+    </aside>
+
+    <div class="canvas">
+      <div class="toolbar">
+        <span class="stats" id="stats"></span>
+        <div class="toolbar-right">
+          <button id="btn-simulate" class="btn btn-primary btn-sm" type="button">▶ Symuluj</button>
+          <button id="btn-reset" class="btn btn-ghost btn-sm" type="button">⟲ Przykładowy flow</button>
+          <button id="btn-clear" class="btn btn-ghost btn-sm" type="button">✕ Wyczyść</button>
+        </div>
+      </div>
+      <div id="flow-list" class="flow-list" aria-label="Kroki przepływu"></div>
     </div>
   </section>
 
-  <section id="flow" class="flow" aria-label="Kroki przepływu"></section>
-
-  <section class="about">
-    <h2>Jak czytać ten układ?</h2>
-    <div class="about-grid">
-      <div class="about-card">
-        <h3>🧱 Kroki</h3>
-        <p>Każdy kafelek to jeden węzeł flowa (<code>start</code>, <code>agent</code>, <code>user_input</code>, <code>action</code>, <code>end</code>). Kliknij kafelek, żeby rozwinąć szczegóły: fragment promptu, opcje bramki, warunki <code>skip_when</code>.</p>
+  <section id="json" class="explain">
+    <h2>Na czym polegają zwrotki JSON?</h2>
+    <p class="section-sub">
+      Tworzenie przepływów opiera się na <strong>kontrakcie z agentem</strong>: każdy węzeł
+      <code>agent</code> kończy pracę odpowiedzią w ustalonym formacie — najczęściej
+      <code>result.json</code>. Flow nie zgaduje, co agent „miał na myśli” — czyta konkretne pola
+      i na nich podejmuje decyzje o kolejnych krokach.
+    </p>
+    <div class="explain-grid">
+      <div class="explain-card">
+        <h3>1. Kontrakt <code>result.json</code></h3>
+        <p>Agent zwraca strukturalną odpowiedź, np. security review:</p>
+        <pre class="json-sample">{
+  "verdict": "success",
+  "findings": [],
+  "confidence": "high",
+  "summary": "Brak istotnych ustaleń — diff nie dotyka autoryzacji."
+}</pre>
+        <p>Pola <code>verdict</code>, <code>findings</code>, <code>confidence</code> to kontrakt — od nich zależy dalszy bieg flowa.</p>
       </div>
-      <div class="about-card">
-        <h3>🔀 Przestawianie</h3>
-        <p>Chwyć kafelek za uchwyt <span class="grip-demo">⋮⋮</span> i upuść w nowym miejscu — albo użyj strzałek ↑ ↓ na kafelku. Kolejność poniżej jest tylko Twoja, definicja flowa się nie zmienia.</p>
+      <div class="explain-card">
+        <h3>2. Krawędzie warunkowe <code>when</code></h3>
+        <p>Kolejny krok wybierany jest na podstawie zwrotki poprzedniego węzła:</p>
+        <pre class="code-sample">output.verdict == 'success'  → idź dalej
+output.verdict == 'needs_fix' → pętla z pytaniem do usera</pre>
+        <p>Przy wielu krawędziach wygrywa pierwszy pasujący warunek.</p>
       </div>
-      <div class="about-card">
-        <h3>📦 Zwrotki między krokami</h3>
-        <p>Każdy blok JSON pod kafelkiem to przykładowa odpowiedź węzła (<code>result.json</code> / output akcji). Zwróć uwagę na pola <code>verdict</code>, <code>findings</code> i <code>confidence</code> — od nich zależą kolejne krawędzie flowa.</p>
-      </div>
-      <div class="about-card">
-        <h3>↩️ Pętle i rozgałęzienia</h3>
-        <p>Chipy pod JSON-em pokazują warunki krawędzi (<code>when</code>): np. <code>comments</code> wraca do kodowania, a pusta tablica <code>findings</code> przy wysokim <code>confidence</code> auto-skipuje bramkę security.</p>
+      <div class="explain-card">
+        <h3>3. Bramki, decyzje i pętle</h3>
+        <p>Węzeł <code>user_input</code> pokazuje człowiekowi output agenta; człowiek wybiera
+        <code>accept</code> albo <code>comments</code> — a <code>comments</code> wraca do agenta
+        jako feedback (pętla z limitem, np. max 12 rund).</p>
+        <p>Bramka może też auto-skipować, gdy kontrakt jest „czysty”:</p>
+        <pre class="code-sample">skip_when:
+  output.verdict == 'success'
+  output.confidence == 'high'
+  empty(output.findings)</pre>
       </div>
     </div>
   </section>
+
+  <section id="ideas" class="ideas">
+    <h2>AI-brainstorm: 12 inspiracji przepływów</h2>
+    <p class="section-sub">
+      Pomysły dla firmy, która utrzymuje i rozwija jedno własne oprogramowanie —
+      każdy kafelek to możliwy flow z tych samych klocków.
+    </p>
+    <div id="ideas-grid" class="ideas-grid"></div>
+  </section>
+
 </main>
 
 <footer class="footer">
-  <p>Publigo Flow — showcase · statyczna strona (HTML + CSS + JS, bez backendu) · kroki na podstawie definicji <em>„Standardowy przepływ” v14</em> (slug <code>przepływ</code>).</p>
+  <p>Publigo Flow — builder · statyczna strona (HTML + CSS + JS, bez backendu) · stan układacza trzymany tylko w przeglądarce (localStorage-free, po odświeżeniu wraca przykładowy flow).</p>
 </footer>
 
 <script src="app.js" defer></script>
