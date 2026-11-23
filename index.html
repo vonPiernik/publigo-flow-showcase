@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Publigo Flow — układaj przepływy jak klocki</title>
+<meta name="description" content="Interaktywny showcase Publigo Flow: przestawiaj kroki przepływu i zobacz, jakie JSON-owe zwrotki zwracają agenty między krokami.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%A1%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <span class="hero-badge">Publigo Flow · showcase</span>
+    <h1>Układaj przepływy <span class="grad">jak klocki</span></h1>
+    <p class="hero-sub">
+      Przeciągnij kroki w inne miejsce, żeby zobaczyć, jak można poukładać flow —
+      od pomysłu do zamknięcia taska w Jirze. Między krokami znajdziesz zwrotki
+      w formacie JSON: to, co faktycznie zwraca agent (werdykt, ustalenia, <em>confidence</em>).
+    </p>
+    <div class="hero-actions">
+      <button id="btn-simulate" class="btn btn-primary" type="button">▶ Symuluj przebieg</button>
+      <button id="btn-reset" class="btn btn-ghost" type="button">⟲ Przywróć kolejność</button>
+      <a class="btn btn-ghost" href="#flow">Zobacz kroki ↓</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="toolbar" aria-label="Narzędzia">
+    <div class="legend" id="legend"></div>
+    <div class="toolbar-right">
+      <span class="stats" id="stats"></span>
+      <button id="btn-simulate-2" class="btn btn-primary btn-sm" type="button">▶ Symuluj</button>
+      <button id="btn-reset-2" class="btn btn-ghost btn-sm" type="button">⟲ Reset</button>
+    </div>
+  </section>
+
+  <section id="flow" class="flow" aria-label="Kroki przepływu"></section>
+
+  <section class="about">
+    <h2>Jak czytać ten układ?</h2>
+    <div class="about-grid">
+      <div class="about-card">
+        <h3>🧱 Kroki</h3>
+        <p>Każdy kafelek to jeden węzeł flowa (<code>start</code>, <code>agent</code>, <code>user_input</code>, <code>action</code>, <code>end</code>). Kliknij kafelek, żeby rozwinąć szczegóły: fragment promptu, opcje bramki, warunki <code>skip_when</code>.</p>
+      </div>
+      <div class="about-card">
+        <h3>🔀 Przestawianie</h3>
+        <p>Chwyć kafelek za uchwyt <span class="grip-demo">⋮⋮</span> i upuść w nowym miejscu — albo użyj strzałek ↑ ↓ na kafelku. Kolejność poniżej jest tylko Twoja, definicja flowa się nie zmienia.</p>
+      </div>
+      <div class="about-card">
+        <h3>📦 Zwrotki między krokami</h3>
+        <p>Każdy blok JSON pod kafelkiem to przykładowa odpowiedź węzła (<code>result.json</code> / output akcji). Zwróć uwagę na pola <code>verdict</code>, <code>findings</code> i <code>confidence</code> — od nich zależą kolejne krawędzie flowa.</p>
+      </div>
+      <div class="about-card">
+        <h3>↩️ Pętle i rozgałęzienia</h3>
+        <p>Chipy pod JSON-em pokazują warunki krawędzi (<code>when</code>): np. <code>comments</code> wraca do kodowania, a pusta tablica <code>findings</code> przy wysokim <code>confidence</code> auto-skipuje bramkę security.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <p>Publigo Flow — showcase · statyczna strona (HTML + CSS + JS, bez backendu) · kroki na podstawie definicji <em>„Standardowy przepływ” v14</em> (slug <code>przepływ</code>).</p>
+</footer>
+
+<script src="app.js" defer></script>
+</body>
+</html>
